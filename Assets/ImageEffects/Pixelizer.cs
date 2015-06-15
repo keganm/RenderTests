@@ -2,6 +2,11 @@
 using System.Collections;
 using UnityStandardAssets.ImageEffects;
 
+
+/// <summary>
+/// Pixelizer.
+/// Create pixeleted image effect using depth pass.
+/// </summary>
 namespace Custom.ImageEffects
 {
 	[ExecuteInEditMode]
