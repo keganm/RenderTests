@@ -11,7 +11,7 @@ namespace Custom.ImageEffects
 {
 	[ExecuteInEditMode]
 	[RequireComponent (typeof(Camera))]
-	[AddComponentMenu("Custom/Image Effects/PixelatedHSV")]
+	[AddComponentMenu("Custom/Image Effects/Pixelizer")]
 
 	public class Pixelizer : PostEffectsBase
 	{

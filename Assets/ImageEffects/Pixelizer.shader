@@ -36,12 +36,12 @@
 			
              struct fragOut
              {
-                 half4 color : COLOR;
+                 half4 color : COLOR1;
                  float depth : DEPTH;
              };
 			
 			
-			fragOut frag( v2f i ) : SV_Target
+			fragOut frag( v2f i ) : SV_Target1
 			{
 				float w = 1.0 / _Size.x;
 				float h = 1.0 / _Size.y;
