@@ -1,4 +1,4 @@
-﻿Shader "Custom/EdgeBlender" {
+﻿Shader "Custom/EdgeBlenderImageEffect" {
 	Properties {
 		_MainTex("", 2D) = ""{}
 		_EdgeTex("", 2D) = ""{}

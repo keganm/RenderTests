@@ -6,9 +6,9 @@ namespace Custom.ImageEffects
 {
 	[ExecuteInEditMode]
 	[RequireComponent (typeof(Camera))]
-	[AddComponentMenu("Custom/Image Effects/EdgeBlender")]
+	[AddComponentMenu("Custom/Image Effects/EdgeBlenderImageEffect")]
 
-	public class EdgeBlender : PostEffectsBase
+	public class EdgeBlenderImageEffect : PostEffectsBase
 	{
 		public Texture m_EdgeTexture;
 		public float m_EdgeScale;
