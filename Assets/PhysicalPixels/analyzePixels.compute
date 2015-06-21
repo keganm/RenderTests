@@ -1,0 +1,80 @@
+﻿////////////////////
+////////////////////
+// Collection of CS functions
+////////////////////
+////////////////////
+#pragma kernel GetPixelBlocks
+#pragma kernel Multiply
+#pragma kernel GetDepth
+
+
+////////////////////
+////////////////////
+
+//Structures to be mirrored in compute shader
+struct Block
+{
+	float2 uv;
+	float3 pos;
+	float4 col;
+};
+
+struct VecMatPair 
+{
+	float3 pos;
+	float4x4 mat;
+	
+};
+////////////////////
+////////////////////
+
+//General Variables
+Texture2D<float4> InputColor;
+Texture2D<float4> DepthBuffer;
+StructuredBuffer<float4x4> localToWorldMatrix;
+
+
+////////////////////////////////////////////////////////
+/// Analyzes Depth information to generate a geometry based pixelation effect at run time
+// In development (using small random sample set)
+
+RWStructuredBuffer<Block> PixelBlocks;
+float w, h;
+float nearClipPlane, farClipPlane;
+
+[numthreads(16,1,1)]
+void GetPixelBlocks(uint3 id:SV_DispatchThreadID)
+{
+	float2 _uv = float2(PixelBlocks[id.x].uv.x * w,PixelBlocks[id.x].uv.y * h);
+	
+	//TODO:Finish Mapping this to real space
+	PixelBlocks[id.x].pos = float3(PixelBlocks[id.x].uv.x * w/16,PixelBlocks[id.x].uv.y * h/16,DepthBuffer[_uv].a * farClipPlane);
+	PixelBlocks[id.x].pos = mul(localToWorldMatrix[0],float4(PixelBlocks[id.x].pos, 1.0));
+	PixelBlocks[id.x].col = float4(DepthBuffer[_uv].rgb, 1.0);
+}
+
+
+///////////////////////////////////////////////////
+/// Calculate localToWorld
+// Currently not implemented
+
+RWStructuredBuffer<VecMatPair> DataBuffer;
+
+[numthreads(16,1,1)]
+void Multiply (uint3 id:SV_DispatchThreadID)
+{        
+		DataBuffer[id.x].pos = mul(localToWorldMatrix[0],float4(DataBuffer[id.x].pos, 1.0));
+}
+
+
+////////////////////////////////////////////////
+/// Returns the depth Texture
+// Testing purposes
+
+RWTexture2D<float4> Result;
+
+[numthreads(8,8,1)]
+void GetDepth (uint3 id : SV_DispatchThreadID)
+{
+    Result[id.xy] = float4(DepthBuffer[id.xy].rgb , InputColor[id.xy].a);
+}

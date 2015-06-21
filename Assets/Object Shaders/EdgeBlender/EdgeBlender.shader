@@ -16,16 +16,13 @@
 		_EdgeGlow ("_EdgeGlow(RGB)", Vector) = (1,1,1)
 	}
 	SubShader {
-        Tags{  
-            "RenderType" = "Tranparent" "Queue"="Geometry"
-            }
 		LOD 200
 		ZWrite on
 		
 		
 		CGPROGRAM
 		// Physically based Standard lighting model, and enable shadows on all light types
-		#pragma surface surf Standard fullforwardshadows vertex:vert alpha:auto
+		#pragma surface surf Standard fullforwardshadows vertex:vert
 
 		// Use shader model 3.0 target, to get nicer looking lighting
 		#pragma target 3.0
@@ -48,6 +45,7 @@
 		void vert (inout appdata_full v, out Input o) {
 			UNITY_INITIALIZE_OUTPUT(Input,o);
 			o.facingRatio = float4(mul ((float3x3)UNITY_MATRIX_IT_MV, v.normal),1.0);
+			//o.facingRatio = float4(abs(v.normal),1.0);
 		}
 
 		half _Glossiness;
@@ -62,27 +60,27 @@
 		fixed4 _Color;
 
 		void surf (Input IN, inout SurfaceOutputStandard o) {
+			o.Normal = UnpackNormal (tex2D (_NormalMap, IN.uv_NormalMap));
 			// Albedo comes from a texture tinted by color
 			fixed4 c = tex2D (_MainTex, IN.uv_MainTex) * _Color;
 			fixed4 oc = tex2D (_OcclusionTex, IN.uv_OcclusionTex);
-			fixed4 e = tex2D (_EdgeTex, IN.uv_EdgeTex);
+			fixed4 e = tex2D (_EdgeTex, IN.uv_EdgeTex * (IN.viewDir.xy * 5.));
 			
 			half f = max(pow(IN.viewDir.b,_EdgeSharp)*_EdgeMulti,_EdgeWeight);
 			f = f < _EdgeWeight ? 0:f;
 			f = min(1,e.a + f);
 			//f *= c.a;
 			
-			clip(f < _EdgeWeight ? -1:1);
+			clip(f < .5 ? -1:1);
 			
 			c.rgb *= oc.rgb;
 			//c.rgb = IN.viewDir;
 			//c.rgb = fixed3(f,f,f);
-			if(f > _EdgeWeight && f < _EdgeWeight + 0.91)
-				o.Albedo = _EdgeGlow;
-				else
+//			if(f > _EdgeWeight && f < _EdgeWeight + 0.91)
+//				o.Albedo = _EdgeGlow;
+//				else
 				o.Albedo = c.rgb;
 			// Metallic and smoothness come from slider variables
-			o.Normal = UnpackNormal (tex2D (_NormalMap, IN.uv_NormalMap))*f;
 			o.Metallic = _Metallic*pow(f,2);
 			o.Smoothness = _Glossiness*pow(f,2);
 			o.Alpha = pow(f,2);
