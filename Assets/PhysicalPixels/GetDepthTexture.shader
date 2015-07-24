@@ -36,9 +36,8 @@ Subshader {
 		half4 c = tex2D(_MainTex, i.uv.xy);
 		float d = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv.xy);
 		d = Linear01Depth(d);
-			 
 		if(d>0.99999)
-			return half4(c.rgb,1);
+			return half4(c.rgb,0);
 		else
 			return half4(c.rgb,d); 
 	}

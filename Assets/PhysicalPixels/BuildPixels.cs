@@ -10,7 +10,7 @@ using UnityStandardAssets.ImageEffects;
 
 namespace Custom.ImageEffects
 {
-	[ExecuteInEditMode]
+	//[ExecuteInEditMode]
 	[RequireComponent (typeof(Camera))]
 	[AddComponentMenu("Custom/Image Effects/BuildPixels")]
 	public class BuildPixels : PostEffectsBase
@@ -48,7 +48,7 @@ namespace Custom.ImageEffects
 		
 		private bool m_Supported;
 
-		int pixelBlockCount = 10;
+		int pixelBlockCount = 500;
 		PixelBlock[] blocks;
 		GameObject[] pixelObjects = null;
 		public Vector3[] pos;
@@ -139,11 +139,12 @@ namespace Custom.ImageEffects
 
 			for(int i = 0; i < pixelObjects.Length; i++)
 			{
-				if(pixelObjects[i] == null)
+				if(pixelObjects[i] == null){
 					pixelObjects[i] = GameObject.CreatePrimitive(PrimitiveType.Cube);
+					//Assigning a material that doesn't write to depth
+					pixelObjects[i].GetComponent<Renderer>().material = m_TestBlockMaterial;
+				}
 				pixelObjects[i].transform.position = blocks[i].pos;
-				//Assigning a material that doesn't write to depth
-				pixelObjects[i].GetComponent<Renderer>().material = m_TestBlockMaterial;
 				//TODO:Fix the custom color leak
 				pixelObjects[i].GetComponent<Renderer>().material.color = blocks[i].col;
 			}

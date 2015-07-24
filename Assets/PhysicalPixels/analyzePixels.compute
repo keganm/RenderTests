@@ -45,12 +45,15 @@ float nearClipPlane, farClipPlane;
 [numthreads(16,1,1)]
 void GetPixelBlocks(uint3 id:SV_DispatchThreadID)
 {
-	float2 _uv = float2(PixelBlocks[id.x].uv.x * w,PixelBlocks[id.x].uv.y * h);
+
+	float2 _uv = float2((PixelBlocks[id.x].uv.x * 0.5 + 0.5) * w,(PixelBlocks[id.x].uv.y * 0.5 + 0.5) * h);
 	
-	//TODO:Finish Mapping this to real space
-	PixelBlocks[id.x].pos = float3(PixelBlocks[id.x].uv.x * w/16,PixelBlocks[id.x].uv.y * h/16,DepthBuffer[_uv].a * farClipPlane);
+	//TODO:Deal with non-linear depthbuffer issue
+	float d = DepthBuffer[_uv].a * farClipPlane;
+	
+	PixelBlocks[id.x].pos = float3(PixelBlocks[id.x].uv.x * w/16,PixelBlocks[id.x].uv.y * h/16, d);
 	PixelBlocks[id.x].pos = mul(localToWorldMatrix[0],float4(PixelBlocks[id.x].pos, 1.0));
-	PixelBlocks[id.x].col = float4(DepthBuffer[_uv].rgb, 1.0);
+	PixelBlocks[id.x].col = float4(DepthBuffer[_uv].rgb * 2.0, 1.0);
 }
 
 
@@ -76,5 +79,5 @@ RWTexture2D<float4> Result;
 [numthreads(8,8,1)]
 void GetDepth (uint3 id : SV_DispatchThreadID)
 {
-    Result[id.xy] = float4(DepthBuffer[id.xy].rgb , InputColor[id.xy].a);
+    Result[id.xy] = float4(DepthBuffer[id.xy].a , DepthBuffer[id.xy].a , DepthBuffer[id.xy].a , InputColor[id.xy].a);
 }
